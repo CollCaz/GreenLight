@@ -17,7 +17,7 @@ And more to come.
 - [x] Using [log](https://github.com/charmbracelet/log) for logging
 - [ ] Unit Tests
 - [ ] Integration Tests
-- [ ] CI/CD using github actions
+- [ ] Automatic Testing using github actions
 
 ## Note on liscene
 The author did not put any licence on his code, this does not mean it is opensource; so keep that in mind.
