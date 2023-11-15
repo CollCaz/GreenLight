@@ -5,14 +5,17 @@ import (
 	"errors"
 )
 
-var ErrRecordNotFound = errors.New("record not found")
+var (
+	ErrRecordNotFound = errors.New("record not found")
+	ErrEditConflict   = errors.New("edit conflict")
+)
 
 type Models struct {
 	Movies interface {
 		Delete(id int64) error
 		Get(id int64) (*Movie, error)
 		Insert(movie *Movie) error
-		Update(movie *Movie) (*Movie, error)
+		Update(movie *Movie) error
 	}
 }
 
