@@ -16,6 +16,7 @@ type Models struct {
 		Get(id int64) (*Movie, error)
 		Insert(movie *Movie) error
 		Update(movie *Movie) error
+		GetAll(title string, genres []string, filters Filters) ([]*Movie, Metadata, error)
 	}
 }
 

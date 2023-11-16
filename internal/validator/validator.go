@@ -22,12 +22,14 @@ func (v *Validator) AddError(key, message string) {
 	}
 }
 
+// IF ok is false, adds error to validator error fields
 func (v *Validator) Check(ok bool, key, message string) {
 	if !ok {
 		v.AddError(key, message)
 	}
 }
 
+// Cheakcs if value is in permited values, returns false if it's not.
 func PermittedValues[T comparable](value T, permittedValues ...T) bool {
 	for i := range permittedValues {
 		if value == permittedValues[i] {
