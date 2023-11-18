@@ -113,7 +113,7 @@ func (app *application) updateMovieHandler(w http.ResponseWriter, r *http.Reques
 		case errors.Is(err, data.ErrRecordNotFound):
 			app.notFoundResponse(w, r)
 		default:
-			app.logger.Error(err)
+			app.logger.PrintError(err, nil)
 			return
 		}
 	}

@@ -5,14 +5,14 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/CollCaz/greenlight/internal/data"
+	"github.com/CollCaz/greenlight/internal/jsonlog"
 	_ "github.com/lib/pq"
-
-	"github.com/charmbracelet/log"
 )
 
 const version = "0.0.1"
@@ -30,7 +30,7 @@ type config struct {
 
 type application struct {
 	config config
-	logger *log.Logger
+	logger *jsonlog.Logger
 	models data.Models
 }
 
@@ -46,45 +46,37 @@ func main() {
 
 	flag.Parse()
 
-	charmLogger := log.NewWithOptions(os.Stderr, log.Options{
-		Prefix:       "http",
-		ReportCaller: true,
-	})
+	logger := jsonlog.New(os.Stderr, jsonlog.LevelInfo)
 
 	db, err := openDB(cfg)
 	if err != nil {
-		charmLogger.Fatal(err)
+		logger.PrintFatal(err, nil)
 	}
 	defer db.Close()
 
-	charmLogger.Info("database connection pool established")
-
 	app := &application{
-		config: cfg,         // Configuration variables
-		logger: charmLogger, // Colurful and human readable logger
+		config: cfg, // Configuration variables
+		logger: logger,
 		models: data.NewModels(db),
 	}
 
 	// Wrap our app logger with standard logger for use in http.Server
 	// Bease it only accepts standard logger interface
-	stdLogger := app.logger.StandardLog(log.StandardLogOptions{
-		ForceLevel: log.ErrorLevel,
-	})
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.port),
 		Handler:      app.routes(),
+		ErrorLog:     log.New(logger, "", 0),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Minute,
 		WriteTimeout: 30 * time.Minute,
-		ErrorLog:     stdLogger,
 	}
 
-	app.logger.Info(fmt.Sprintf("Starting %s at %s", cfg.env, srv.Addr))
+	app.logger.PrintInfo(fmt.Sprintf("Starting %s at %s", cfg.env, srv.Addr), nil)
 
 	err = srv.ListenAndServe()
 
-	app.logger.Fatal(err)
+	app.logger.PrintFatal(err, nil)
 }
 
 func openDB(cfg config) (*sql.DB, error) {
